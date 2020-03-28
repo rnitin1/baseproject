@@ -1,0 +1,115 @@
+{
+    "swagger" : "2.0",
+
+    "info" : {
+        "title":"User form",
+        "description":"Login/Register form",
+        "contact" :{
+            "name":"Nitin"
+        }
+    },
+    "produces" : [
+        "application/json"
+    ],
+    "host":"localhost:3000",
+    "basePath": "",
+    "paths" : {
+
+
+        "/register" : {
+            "post" : {
+                "x-swagger-router-controller": "middleware-name1",
+                "operationId": "register",
+                "parameters" :[{
+                    "in" : "formdata" ,
+                    "name" : "name",
+                    "required" : true,
+                    "description" : "Your full Name ",
+                    "value" : "",
+                    "type" : "string"  
+                },
+                {
+                    "in" : "formdata" ,
+                    "name" : "email",
+                    "required" : true,
+                    "description" : "Your Email id ",
+                    "value" : "",
+                    "type" : "string"  
+                },
+                {
+                    "in" : "formdata" ,
+                    "name" : "password",
+                    "required" : true,
+                    "description" : "Your password",
+                    "value" : "",
+                    "type" : "string"  
+                }
+                ],
+                "responses" : {}
+
+            }
+        },
+        
+        "/login" : {
+            "post" : {
+                "x-swagger-router-controller": "middleware-name1",
+                "operationId": "login",
+                "parameters" :[
+                {
+                    "in" : "formdata" ,
+                    "name" : "email",
+                    "required" : true,
+                    "description" : "Your Email id ",
+                    "value" : "",
+                    "type" : "string"  
+                },
+                {
+                    "in" : "formdata" ,
+                    "name" : "password",
+                    "required" : true,
+                    "description" : "Your password",
+                    "value" : "",
+                    "type" : "string"  
+                }
+                ],
+                "responses" : {}
+
+            }
+        },
+
+        "/changepassword" : {
+            "post" : {
+                "x-swagger-router-controller": "middleware-name1",
+                "operationId": "changepassword",
+                "parameters" :[{
+                    "in" : "formdata" ,
+                    "name" : "password",
+                    "required" : true,
+                    "description" : "Your old password ",
+                    "value" : "",
+                    "type" : "string"  
+                },
+                {
+                    "in" : "formdata" ,
+                    "name" : "newpassword",
+                    "required" : true,
+                    "description" : "Enter new password ",
+                    "value" : "",
+                    "type" : "string"  
+                },
+                {
+                    "in" : "formdata" ,
+                    "name" : "confirmpassword",
+                    "required" : true,
+                    "description" : "Enter Confirm-password",
+                    "value" : "",
+                    "type" : "string"  
+                }
+                ],
+                "responses" : {}
+
+            }
+        }
+    }
+    
+}
