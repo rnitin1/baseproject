@@ -14,6 +14,9 @@ const initializePassport = require('./config/passport')
 const methodOverride = require('method-override')
 const mongoose = require('mongoose')
 const User = require('./model/user');
+const crypto =require('crypto')
+const nodemailer = require('nodemailer')
+const async = require('async')
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDocs = require('./config/userSwagger.json');
 
@@ -115,7 +118,7 @@ if(error ) return res.status(404).send(error.details[0].message);
         //res.header('something')
         //res.redirect('/login')
         //res.flash('Successfully registered')
-   console.log(user);
+        res.send(user)
 
     }
     catch (err) {
@@ -147,10 +150,11 @@ app.get('/login',checkNotAuthenticate,(req,res,next)=>{
 })
 
 app.post('/login',checkNotAuthenticate,passport.authenticate('local',{
-    successRedirect:'/',
-    failureRedirect:'/login',
-    failureFlash:true,
-    successFlash:"Welcome"
+     successRedirect:'/',
+    // failureRedirect:'/login',
+    // failureFlash:true,
+    // successFlash:"Welcome"
+    
 }
 
 ))
@@ -290,6 +294,120 @@ app.post('/changepassword',(req,res,next)=>{
 //forgot password
 
 
+//-------------Sending OTP to user by nodemailer
+app.post('/forgotpasswordtoken',(req,res,next)=>{
+    async.waterfall([
+        (done)=>{
+            //creating token or OTP
+            crypto.randomBytes(2,(err,buf)=>{
+                let token = buf.toString('hex');
+                done(err,token)
+            })
+        },
+        //Checking whether mail exists or not
+        (token,done)=>{
+            User.findOne({email:req.body.email},(err,user)=>{
+                if (!user) {
+                    return res.send('No user with this Email')
+                    
+                    
+                }else{
+                    //assigning token to user
+                    user.resetPasswordToken=token;
+                    user.resetPasswordExpire=Date.now()+3600000;//our
+                }
+                user.save((err)=>{
+                    done(err,token,user)
+                })
+            })
+        },
+        //Initializing nodemailer
+        (token,user,done)=>{
+            const smtpTransport = nodemailer.createTransport({
+                service:'gmail',
+                auth:{
+                    user:'nitinrana000111@gmail.com',
+                    pass:process.env.GMAILPW
+                }
+            })
+            const mailOptions = {
+                to:user.email,
+                from: 'nitinrana000111@gmail.com',
+                subject:"Password reset OTP",
+                text:'OTP : '+token
+            }
+            smtpTransport.sendMail(mailOptions,(err)=>{
+                console.log('mail sent');
+                res.send('OTP sent')
+                done(err)
+            })
+        }
+    ],
+    (err)=>{
+        if (err) {
+            res.send(err)
+            return next(err)
+            
+        }
+    })
+
+})
+
+
+// ----------------Reseting the password by OTP
+app.post('/resetpassword',(req,res,next)=>{
+    async.waterfall([
+        (done)=>{
+            //checking OTP 
+            User.findOne({resetPasswordToken:req.body.token,
+                resetPasswordExpire:{$gt:Date.now()}},
+                (err,user)=>{
+                    if (!user) {
+                        return res.send(`OTP is invalid or has expired ${err}`)
+                    } else {
+                        if (req.body.password===req.body.confirmpassword) {
+                            //user.setPassword(req.body.newpassword,(err)=>{
+                                user.resetPasswordToken=undefined;
+                                user.resetPasswordExpire=undefined;
+                                bcrypt.hash(req.body.password,10,(err,hash)=>{
+                                    user.password=hash;
+
+                                    user.save((err,user)=>{
+                                        if (err) {
+                                            return res.send(err)
+                                        }
+                                        res.send('Password changed successfully')
+                                    })
+                                })
+                           // })
+                        }else{
+                            res.send('Password did not match')
+                        }
+                    }
+                })
+        }
+    ])
+})
+
+
+
+
+
+
+
+//List of users
+app.get('/userslist',(req,res,next)=>{
+    User.find({},(err,user)=>{
+        if(err){
+            next (err)
+        }else{
+            res.send(user)
+        }
+    })
+    
+    
+})
+
 
 
 
@@ -298,4 +416,3 @@ app.post('/changepassword',(req,res,next)=>{
 const port = process.env.Port || 3000;
 
 app.listen(port,()=>console.log(`server is running at port ${port}.....`))
-

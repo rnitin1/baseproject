@@ -21,7 +21,7 @@
                 "x-swagger-router-controller": "middleware-name1",
                 "operationId": "register",
                 "parameters" :[{
-                    "in" : "formdata" ,
+                    "in" : "formData" ,
                     "name" : "name",
                     "required" : true,
                     "description" : "Your full Name ",
@@ -29,7 +29,7 @@
                     "type" : "string"  
                 },
                 {
-                    "in" : "formdata" ,
+                    "in" : "formData" ,
                     "name" : "email",
                     "required" : true,
                     "description" : "Your Email id ",
@@ -37,7 +37,7 @@
                     "type" : "string"  
                 },
                 {
-                    "in" : "formdata" ,
+                    "in" : "formData" ,
                     "name" : "password",
                     "required" : true,
                     "description" : "Your password",
@@ -56,7 +56,7 @@
                 "operationId": "login",
                 "parameters" :[
                 {
-                    "in" : "formdata" ,
+                    "in" : "formData" ,
                     "name" : "email",
                     "required" : true,
                     "description" : "Your Email id ",
@@ -64,7 +64,7 @@
                     "type" : "string"  
                 },
                 {
-                    "in" : "formdata" ,
+                    "in" : "formData" ,
                     "name" : "password",
                     "required" : true,
                     "description" : "Your password",
@@ -82,7 +82,7 @@
                 "x-swagger-router-controller": "middleware-name1",
                 "operationId": "changepassword",
                 "parameters" :[{
-                    "in" : "formdata" ,
+                    "in" : "formData" ,
                     "name" : "password",
                     "required" : true,
                     "description" : "Your old password ",
@@ -90,7 +90,7 @@
                     "type" : "string"  
                 },
                 {
-                    "in" : "formdata" ,
+                    "in" : "formData" ,
                     "name" : "newpassword",
                     "required" : true,
                     "description" : "Enter new password ",
@@ -98,7 +98,71 @@
                     "type" : "string"  
                 },
                 {
-                    "in" : "formdata" ,
+                    "in" : "formData" ,
+                    "name" : "confirmpassword",
+                    "required" : true,
+                    "description" : "Enter Confirm-password",
+                    "value" : "",
+                    "type" : "string"  
+                }
+                ],
+                "responses" : {}
+
+            }
+        },
+
+        "/userslist" : {
+            "get" : {
+                "x-swagger-router-controller": "middleware-name1",
+                "operationId": "userslist",
+                
+                "responses" : {}
+
+            }
+        },
+
+
+        "/forgotpasswordtoken" : {
+            "post" : {
+                "x-swagger-router-controller": "middleware-name1",
+                "operationId": "changepassword",
+                "parameters" :[ 
+                {
+                    "in" : "formData" ,
+                    "name" : "email",
+                    "required" : true,
+                    "description" : "Enter Email",
+                    "value" : "",
+                    "type" : "string"  
+                }
+                 
+                ],
+                "responses" : {}
+
+            }
+        },
+        "/resetpassword" : {
+            "post" : {
+                "x-swagger-router-controller": "middleware-name1",
+                "operationId": "resetpassword",
+                "parameters" :[{
+                    "in" : "formData" ,
+                    "name" : "token",
+                    "required" : true,
+                    "description" : "Your OTP ",
+                    "value" : "",
+                    "type" : "string"  
+                },
+                {
+                    "in" : "formData" ,
+                    "name" : "password",
+                    "required" : true,
+                    "description" : "Enter new password ",
+                    "value" : "",
+                    "type" : "string"  
+                },
+                {
+                    "in" : "formData" ,
                     "name" : "confirmpassword",
                     "required" : true,
                     "description" : "Enter Confirm-password",
@@ -110,6 +174,7 @@
 
             }
         }
+
     }
     
 }
