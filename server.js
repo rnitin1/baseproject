@@ -162,7 +162,8 @@ app.post('/login',checkNotAuthenticate,passport.authenticate('local',{
 //logout
 
 app.delete('/logout',(req,res,next)=>{
-    req.logOut()
+    req.logOut();
+    return res.send('Logged out')
     //res.render('login')
 })
 
@@ -376,7 +377,7 @@ app.post('/resetpassword',(req,res,next)=>{
                                         if (err) {
                                             return res.send(err)
                                         }
-                                        res.send('Password changed successfully')
+                                        res.send('Password changed successfully ')
                                     })
                                 })
                            // })

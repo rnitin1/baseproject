@@ -76,6 +76,15 @@
 
             }
         },
+        "/logout" : {
+            "delete" : {
+                "x-swagger-router-controller": "middleware-name1",
+                "operationId": "logout",
+                
+                "responses" : {}
+
+            }
+        },
 
         "/changepassword" : {
             "post" : {
