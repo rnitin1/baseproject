@@ -8,13 +8,17 @@ const User = require('../model/user');
 const crypto =require('crypto')
 const nodemailer = require('nodemailer')
 const async = require('async');
-const initializePassport = require('../config/passport')
-//passport verification
-initializePassport(
-    passport,
-    email=> User.findOne({email:email
-    }))
+const mongoose = require('mongoose')
 
+
+//middlewares
+router.use(express.urlencoded({extended:false}));
+router.use(passport.initialize());
+router.use(session({
+    secret:process.env.SESSION_SESSION,
+    resave:false,
+    saveUninitialized:false,
+}))
 
 
 
@@ -42,7 +46,6 @@ router.post('/register',checkNotAuthenticate,async (req,res)=>{
                         .catch(err=>console.log(err))
 
                 res.send(user)
-
             }
             catch (err) {
                 console.log('====Error',err);
@@ -57,12 +60,7 @@ router.post('/register',checkNotAuthenticate,async (req,res)=>{
 })
 
 //login
-router.post('/login',checkNotAuthenticate,passport.authenticate('local',{
-    //successRedirect:'/',
-   // failureRedirect:'/login',
-   // failureFlash:true,
-   // successFlash:"Welcome"
-}),
+router.post('/login',checkNotAuthenticate,passport.authenticate('local',{}),
 (req,res)=>{
    res.send(`Welcome ${req.user.name}`)
    
@@ -79,13 +77,8 @@ router.delete('/logout',(req,res,next)=>{
 router.post('/changepassword',(req,res,next)=>{
     sess=req.session;
 
-    console.log('above',req.body);
-    console.log(sess);
-    
     //checking whether in session
     if (sess.passport.user.email) {
-
-
         // validating change password 
         const validateChangepassword = (user)=>{
             const schema = {
@@ -98,9 +91,6 @@ router.post('/changepassword',(req,res,next)=>{
         let {error}=validateChangepassword(req.body);//object distucturing(result.error)
         if(error ) return res.status(404).send(error.details[0].message);
     
-
-        console.log('testing ',req.body)    
-
         const oldPassword=req.body.password;
         const newPassword=req.body.newpassword;
         const confirmPassword=req.body.confirmpassword;
@@ -124,13 +114,14 @@ router.post('/changepassword',(req,res,next)=>{
                                         return console.log(err);
                                         
                                     } else {
-                                        console.log(user,'Your password has been changed');
+                                        console.log('Your password has been changed');
                                         
                                     }
                                 })
                             })
                         }
                     }
+                    
                 })
             }
 
@@ -165,7 +156,7 @@ router.post('/forgotpasswordtoken',(req,res,next)=>{
                 }else{
                     //assigning token to user
                     user.resetPasswordToken=token;
-                    user.resetPasswordExpire=Date.now()+3600000;//our
+                    user.resetPasswordExpire=Date.now()+3600000;//hour
                 }
                 user.save((err)=>{
                     done(err,token,user)
@@ -175,7 +166,7 @@ router.post('/forgotpasswordtoken',(req,res,next)=>{
         //Initializing nodemailer
         (token,user,done)=>{
             const smtpTransport = nodemailer.createTransport({
-                service:'gmail',
+                service:'Gmail',
                 auth:{
                     user:'nitinrana000111@gmail.com',
                     pass:process.env.GMAILPW
@@ -190,13 +181,13 @@ router.post('/forgotpasswordtoken',(req,res,next)=>{
             smtpTransport.sendMail(mailOptions,(err)=>{
                 console.log('mail sent');
                 res.send('OTP sent')
-                done(err)
+                return done(err)
             })
         }
     ],
     (err)=>{
         if (err) {
-            res.send(err)
+            //res.send(err)
             return next(err)
             
         }
@@ -278,7 +269,16 @@ function checkNotAuthenticate(req,res,next) {
 }
 
 
+//validation Schema
+const validateData = (user)=>{
+    const schema = {
+        name:joi.string().min(3),
+        email:joi.string().email().trim(),
+        password:joi.string().regex(/^[a-zA-Z0-9!@#$%&*]{3,25}$/).min(6)
 
+    }
+    return joi.validate(user,schema)
+}
 
 
 module.exports=router;

@@ -17,7 +17,7 @@ const swaggerJsDocs = require('./config/userSwagger.json');
 
 //routes
 const user = require('./routes/user')
-app.use('/user',user)
+app.use('/',user)
 
 
 //Initializing swagger
@@ -41,16 +41,7 @@ mongoose.connect('mongodb://localhost/users'
 //app.set('views','./views');
 app.set('views',path.join(__dirname,'views'))
 app.set('view engine','ejs')
-app.use(express.urlencoded({extended:false}));
 app.use(flash())
-app.use(session({
-    secret:process.env.SESSION_SESSION,
-    resave:false,
-    saveUninitialized:false,
-    
-
-}))
-app.use(passport.initialize());
 
 app.use(passport.session());
 app.use(methodOverride('_method'))
